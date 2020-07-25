@@ -1,5 +1,5 @@
 // Setup empty JS object to act as endpoint for all routes
-const appData = {}
+const appData = []
 
 // Express to run server and routes
 const express = require('express')
@@ -8,10 +8,6 @@ const express = require('express')
 const app = express()
 
 const PORT = process.env.PORT || 5000
-
-app.get('/', (req, res) => {
-  res.send('Hello World')
-})
 
 app.listen(PORT, err => {
   if (err) {
@@ -50,11 +46,19 @@ app.get('/all', (req, res) => {
 })
 
 // Post Route  
-const data = []
 
-app.post('/comment', addComment)
+app.post('/sendInfo', addInfo)
 
-function addComment(req, res) {
+function addInfo(req, res) {
   console.log(req.body)
-  data.push(req.body)
+  const data = req.body
+
+  newEntry = {
+    city: data.city,
+    comment: data.comment
+  }
+
+  appData.push(newEntry)
+
+  res.send({message: "POST request is successful"})
 }

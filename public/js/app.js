@@ -2,9 +2,16 @@
 const key = '37e07d71f65e682fa28dc78dad83d1d5';
 
 // api.openweathermap.org/data/2.5/weather?zip= {zip code},{country code}&appid={your api key}
-const userInput = document.getElementById('zip');
+const zipInput = document.getElementById('zip');
+const feelingInput = document.getElementById('feelings');
 const submitBtn = document.getElementById('generate');
 const apiMessage = document.getElementById('api-message');
+
+//Set API variables
+const baseURL = 'https://api.openweathermap.org/data/2.5/weather?zip=';
+const countryCode = 'us';
+
+// https://api.openweathermap.org/data/2.5/weather?zip=90001,US&appid=37e07d71f65e682fa28dc78dad83d1d5
 
 // Event listener to add function to existing HTML DOM element
 submitBtn.addEventListener('click', performAction);
@@ -12,64 +19,62 @@ submitBtn.addEventListener('click', performAction);
 /* Function called by event listener */
 function performAction(e) {
   e.preventDefault();
-  //Get user input value
-  const zipCode = userInput.value;
 
-  //Set other variables
-  const baseURL = 'https://api.openweathermap.org/data/2.5/weather?zip=';
-  const countryCode = 'us';
+  //Get user zip input value
+  const zip = zipInput.value;
 
-  /* Function to fetch Web API Data*/
-  const fetchData = async () => {
-    try {
-      const res = await fetch(`${baseURL}${zipCode},${countryCode}&appid=${key}`);
-      const data = await res.json();
-      const {
-        name,
-        visibility
-      } = data;
-      console.log(visibility + ' ' + name);
-    } catch (error) {
-      console.log(`Something went wrong: ${error}`);
-    }
-  }
+  //Get user feeling input value
+  const feeling = feelingInput.value;
 
-  fetchData();
+  getWeatherData(baseURL, countryCode, zip, key)
+    .then(data => {
+      postData('http://localhost:5000/sendInfo', {
+        city: data.name,
+        comment: feeling
+      });
+    })
+    .then(() => updateUI())
 }
 
-/* Function to POST data */
-// const postData = async (url = '', data = {}) => {
-//   console.log(data);
-//   const response = await fetch(url, {
-//     method: 'POST',
-//     credentials: 'same-origin',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify(data),
-//   });
+/* Update UI Function */
+const updateUI = async () => {
+  const request = await fetch('http://localhost:5000/all');
 
-//   try {
-//     const newData = await response.json();
-//     console.log(newData);
-//     return newData
-//   } catch (error) {
-//     console.log("error", error);
-//   }
-// }
+  try {
+    const allData = await request.json();
+    console.log(allData);
+    
+    document.getElementById('date').innerHTML = allData[0].date;
+    
+  } catch (error) {
+    console.log('error', error);
+  }
+}
 
-// postData('/comment', {answer: 42});
+/* Function to fetch Web API Data*/
+const getWeatherData = async (baseURL, countryCode, zip, key) => {
+  try {
+    const res = await fetch(`${baseURL}${zip},${countryCode}&appid=${key}`);
+    const data = await res.json();
+    console.log(data);
+    return data;
 
+  } catch (error) {
+    console.log(`Something went wrong: ${error}`);
+  }
+}
+
+/* Function to post data to server */
 const postData = async (url = '', data = {}) => {
   console.log(data);
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'same-origin',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
     // Body data type must match "Content-Type" header        
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   });
 
   try {
@@ -80,9 +85,6 @@ const postData = async (url = '', data = {}) => {
     console.log("error", error);
   }
 }
-
-postData('/comment', { answer: 42 });
-
 
 
 /* Function to GET Project Data */
