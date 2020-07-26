@@ -1,5 +1,6 @@
 // Setup empty JS object to act as endpoint for all routes
-const appData = []
+const appData = {}
+entry = 0;
 
 // Express to run server and routes
 const express = require('express')
@@ -55,10 +56,14 @@ function addInfo(req, res) {
 
   newEntry = {
     city: data.city,
-    comment: data.comment
+    date: data.date,
+    temperature: data.temperature,
+    message: data.message
   }
 
-  appData.push(newEntry)
+  appData[entry] = newEntry;
 
-  res.send({message: "POST request is successful"})
+  res.send({
+    message: "POST request is successful"
+  })
 }
