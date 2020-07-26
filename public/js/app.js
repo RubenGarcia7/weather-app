@@ -88,7 +88,7 @@ function performAction(e) {
       const formattedTemp = celsiusTemp.toFixed(0) + '°C';
 
       /* Send data to the server */
-      postData('http://localhost:5000/sendInfo', {
+      postData('/sendInfo', {
         city: data.name,
         date: formattedDate,
         temperature: formattedTemp,
@@ -102,7 +102,7 @@ function performAction(e) {
 
 /* Get the project data and update the UI */
 const updateUI = async () => {
-  const request = await fetch('http://localhost:5000/all');
+  const request = await fetch('/all');
 
   try {
     const allData = await request.json();
