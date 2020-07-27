@@ -1,12 +1,12 @@
 // Personal API Key for OpenWeatherMap API
 const key = '37e07d71f65e682fa28dc78dad83d1d5';
 
-// api.openweathermap.org/data/2.5/weather?zip= {zip code},{country code}&appid={your api key}
+// Set variables
 const zipInput = document.getElementById('zip');
 const messageInput = document.getElementById('feelings');
 const submitBtn = document.getElementById('generate');
 
-// UI Elements
+// UI Elements variables
 const welcomeField = document.getElementById('welcome');
 const cityField = document.getElementById('city');
 const temperatureField = document.getElementById('temperature');
@@ -60,12 +60,9 @@ const currentWeekDay = days[weekDayIndex];
 /* Months Array */
 const formattedDate = `${currentWeekDay}, ${currentDay} ${currentMonth} ${currentYear}`
 
-
 //Set API variables
 const baseURL = 'https://api.openweathermap.org/data/2.5/weather?zip=';
 const countryCode = 'us';
-
-// https://api.openweathermap.org/data/2.5/weather?zip=90001,US&appid=37e07d71f65e682fa28dc78dad83d1d5
 
 // Event listener to add function to existing HTML DOM element
 submitBtn.addEventListener('click', performAction);
@@ -80,6 +77,7 @@ function performAction(e) {
   //Get user feeling input value
   const message = messageInput.value;
 
+  //Get weather data
   getWeatherData(baseURL, countryCode, zip, key)
     .then(data => {
 
@@ -88,7 +86,7 @@ function performAction(e) {
       const formattedTemp = celsiusTemp.toFixed(0) + '°C';
 
       /* Send data to the server */
-      postData('/sendInfo', {
+      postData('http://localhost:5000/sendInfo', {
         city: data.name,
         date: formattedDate,
         temperature: formattedTemp,
@@ -100,26 +98,9 @@ function performAction(e) {
     .then(() => updateUI())
 }
 
-/* Get the project data and update the UI */
-const updateUI = async () => {
-  const request = await fetch('/all');
-
-  try {
-    const allData = await request.json();
-    
-    welcomeField.style.display = "none";
-    cityField.innerHTML = allData[0].city;
-    temperatureField.innerHTML = allData[0].temperature;
-    dateField.innerHTML = allData[0].date;
-    messageField.innerHTML = allData[0].message;
-    
-  } catch (error) {
-    console.log('error', error);
-  }
-}
-
 /* Function to fetch Web API Data*/
 const getWeatherData = async (baseURL, countryCode, zip, key) => {
+
   try {
     const res = await fetch(`${baseURL}${zip},${countryCode}&appid=${key}`);
     const data = await res.json();
@@ -152,5 +133,26 @@ const postData = async (url = '', data = {}) => {
     console.log("error", error);
   }
 }
+
+/* Get the project data and update the UI */
+const updateUI = async () => {
+  const request = await fetch('http://localhost:5000/all');
+
+  try {
+    const allData = await request.json();
+    
+    // Update UI elements with the allData object
+    welcomeField.style.display = "none";
+    cityField.innerHTML = allData[0].city;
+    temperatureField.innerHTML = allData[0].temperature;
+    dateField.innerHTML = allData[0].date;
+    messageField.innerHTML = allData[0].message;
+    
+  } catch (error) {
+    console.log('error', error);
+  }
+}
+
+
 
 

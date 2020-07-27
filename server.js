@@ -34,20 +34,16 @@ app.use(cors())
 
 // Initialize the main project folder
 app.use(express.static('public'))
-// Spin up the server
-
-// Callback to debug
 
 // Initialize all route with a callback function
-
+app.get('/all', sendAppData)
 
 // Callback function to complete GET '/all'
-app.get('/all', (req, res) => {
+function sendAppData(req, res) {
   res.send(appData)
-})
+}
 
 // Post Route  
-
 app.post('/sendInfo', addInfo)
 
 function addInfo(req, res) {
